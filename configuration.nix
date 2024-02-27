@@ -12,7 +12,7 @@
     ];
   nix = {
     # use unstable nix so we can access flakes
-    package = pkgs.nixUnstable;
+  #  package = pkgs.nixUnstable;
     extraOptions = ''
       experimental-features = nix-command flakes
       keep-outputs = true
@@ -27,7 +27,32 @@
       trusted-public-keys = ["mitchellh-nixos-config.cachix.org-1:bjEbXJyLrL1HZZHBbO4QALnI5faYZppzkU4D2s0G8RQ="];
     };
   };
-
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      allowAliases = false;
+      permittedInsecurePackages = [
+                      "electron-25.9.0"
+      ];
+      packageOverrides = pkgs: {
+        intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+      };
+    };
+  };
+nixpkgs.overlays = [
+  (final: prev: {
+    gnome = prev.gnome.overrideScope' (gnomeFinal: gnomePrev: {
+      mutter = gnomePrev.mutter.overrideAttrs ( old: {
+        src = pkgs.fetchgit {
+          url = "https://gitlab.gnome.org/vanvugt/mutter.git";
+          # GNOME 45: triple-buffering-v4-45
+          rev = "0b896518b2028d9c4d6ea44806d093fd33793689";
+          sha256 = "sha256-mzNy5GPlB2qkI2KEAErJQzO//uo8yO0kPQUwvGDwR4w=";
+        };
+      } );
+    });
+  })
+];
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -110,7 +135,6 @@
   systemd.services."autovt@tty1".enable = false;
 
   # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -149,14 +173,16 @@
 	btop
 	
   ];
+
  # fonts
 programs.steam.enable = true;
+
 fonts.packages = with pkgs; [
 	noto-fonts
         dejavu_fonts
         iosevka-bin
-	noto-fonts-cjk
-	noto-fonts-emoji
+#	noto-fonts-cjk
+	#noto-fonts-emoji
 	liberation_ttf
 	font-awesome
 	jetbrains-mono
@@ -187,7 +213,8 @@ environment.gnome.excludePackages = with pkgs.gnome; [
     baobab      # disk usage analyzer
     cheese      # photo booth
     epiphany    # web browser
-    gedit       # text editor
+    #gedit       # text editor
+    #gnome-tour
     simple-scan # document scanner
     totem       # video player
     yelp        # help viewer
@@ -199,9 +226,7 @@ environment.gnome.excludePackages = with pkgs.gnome; [
     gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-contacts
     gnome-maps gnome-music gnome-weather
   ];
-  nixpkgs.config.packageOverrides = pkgs: {
-    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
-  };
+
   hardware.opengl = {
     enable = true;
     extraPackages = with pkgs; [
@@ -253,8 +278,9 @@ powerManagement.powertop.enable = true;
        dates = "weekly";
        options = "--delete-older-than 10d";
      };
-     settings-auto-optimise-store = true;
+     autoOptimiseStore= true;
      optimise = {
+       automatic = true;
        dates = [ "weekly" ];
      };
    };
