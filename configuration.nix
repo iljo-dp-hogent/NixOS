@@ -53,12 +53,14 @@
   # Enable the GNOME Desktop Environment.
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.videoDrivers = ["nvidia"];
   #NVIM STYLE
   environment.shellInit = ''
     if [ ! -d ~/.config/nvim.bak ]; then
       # Clone the GitHub repository into ~/.config/nvim.bak
       git clone https://github.com/theprimeagen/neovimrc ~/.config/nvim.bak
     fi
+    gsettings set org.gnome.desktop.interface text-scaling-factor 1.35
   '';
   # Configure keymap in X11
   services.xserver = {
@@ -117,6 +119,9 @@
   #  wget
 	neovim
 	curl
+	kitty
+	obsidian
+	vesktop
 	git
 	neofetch
 	gcc
@@ -248,9 +253,8 @@ powerManagement.powertop.enable = true;
        dates = "weekly";
        options = "--delete-older-than 10d";
      };
-     autoOptimiseStore = true;
+     settings-auto-optimise-store = true;
      optimise = {
-       automatic = true;
        dates = [ "weekly" ];
      };
    };
