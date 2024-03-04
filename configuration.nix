@@ -85,7 +85,7 @@ nixpkgs.overlays = [
       # Clone the GitHub repository into ~/.config/nvim.bak
       git clone https://github.com/theprimeagen/neovimrc ~/.config/nvim.bak
     fi
-    gsettings set org.gnome.desktop.interface text-scaling-factor 1.35
+    gsettings set org.gnome.desktop.interface text-scaling-factor 1.23
   '';
   # Configure keymap in X11
   services.xserver = {
@@ -163,6 +163,7 @@ nixpkgs.overlays = [
 	jetbrains.idea-ultimate
 	fish
 	powertop
+	gnome-extension-manager
 	tmux
 	acpi
 	nvtop
